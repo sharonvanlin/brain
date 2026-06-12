@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="知识大脑">
+<title>Sharon 知识大脑</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  :root {
+    --bg: #0B1320;
+    --card: #141E2E;
+    --card2: #1A2535;
+    --border: #2A3A4A;
+    --teal: #1D9E75;
+    --blue: #1D6FA4;
+    --amber: #F59E0B;
+    --purple: #8B5CF6;
+    --red: #EF4444;
+    --orange: #F97316;
+    --text: #E8EDF2;
+    --muted: #6B8099;
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    max-width: 480px;
+    margin: 0 auto;
+    font-size: 14px;
+  }
+
+  /* ── Header ── */
+  .header {
+    background: linear-gradient(135deg, var(--blue), var(--teal));
+    padding: 14px 16px 12px;
+    position: sticky; top: 0; z-index: 200;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .header-left h1 { font-size: 17px; font-weight: 700; color: white; }
+  .header-left p { font-size: 10px; color: rgba(255,255,255,0.7); margin-top: 1px; }
+  .header-right { display: flex; gap: 8px; }
+  .hbtn {
+    background: rgba(255,255,255,0.15); border: none; color: white;
+    padding: 6px 10px; border-radius: 6px; font-size: 12px; cursor: pointer;
+  }
+  .hbtn:active { background: rgba(255,255,255,0.25); }
+
+  /* ── Tabs ── */
+  .tabs {
+    display: flex; background: var(--card);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto; scrollbar-width: none;
+    position: sticky; top: 58px; z-index: 190;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    flex-shrink: 0; padding: 10px 14px;
+    font-size: 12px; color: var(--muted); cursor: pointer;
+    border-bottom: 2px solid transparent; white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .tab.active { color: var(--teal); border-bottom-color: var(--teal); background: #1E2D3D; }
+
+  /* ── Content ── */
+  .section { display: none; padding: 12px 14px; padding-bottom: calc(80px + var(--safe-bottom)); }
+  .section.active { display: block; }
+
+  /* ── Input Area ── */
+  .input-card {
+    background: var(--card); border-radius: 12px;
+    padding: 12px; margin-bottom: 12px;
+    border: 1px solid var(--border);
+  }
+  .input-row { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+  .cat-btn {
+    padding: 5px 10px; border-radius: 16px; font-size: 11px;
+    border: 1px solid var(--border); background: transparent;
+    color: var(--muted); cursor: pointer; transition: all 0.2s;
+  }
+  .cat-btn.active { color: white; border-color: transparent; }
+  .cat-btn[data-cat="灵感"].active { background: var(--amber); }
+  .cat-btn[data-cat="行业"].active { background: var(--blue); }
+  .cat-btn[data-cat="客户"].active { background: var(--teal); }
+  .cat-btn[data-cat="话术"].active { background: var(--purple); }
+  .cat-btn[data-cat="常识"].active { background: var(--orange); }
+  .cat-btn[data-cat="待办"].active { background: var(--red); }
+
+  textarea {
+    width: 100%; background: var(--card2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px; color: var(--text);
+    font-size: 14px; font-family: inherit; resize: none;
+    min-height: 80px; line-height: 1.6; outline: none;
+    transition: border-color 0.2s;
+  }
+  textarea:focus { border-color: var(--teal); }
+  textarea::placeholder { color: var(--muted); }
+
+  .input-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+  .star-row { display: flex; gap: 4px; }
+  .star-btn {
+    background: transparent; border: none; font-size: 18px;
+    cursor: pointer; padding: 2px; opacity: 0.4; transition: opacity 0.2s;
+  }
+  .star-btn.on { opacity: 1; }
+  .save-btn {
+    background: var(--teal); color: white; border: none;
+    padding: 8px 20px; border-radius: 8px; font-size: 13px;
+    font-weight: 600; cursor: pointer; transition: background 0.2s;
+  }
+  .save-btn:active { background: #15805E; }
+  .char-count { font-size: 10px; color: var(--muted); }
+
+  /* ── Search ── */
+  .search-wrap { position: relative; margin-bottom: 12px; }
+  .search-input {
+    width: 100%; background: var(--card); border: 1px solid var(--border);
+    border-radius: 8px; padding: 9px 12px 9px 34px;
+    color: var(--text); font-size: 13px; outline: none;
+    transition: border-color 0.2s;
+  }
+  .search-input:focus { border-color: var(--teal); }
+  .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 14px; color: var(--muted); }
+
+  /* ── Filter chips ── */
+  .filter-row { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; scrollbar-width: none; padding-bottom: 4px; }
+  .filter-row::-webkit-scrollbar { display: none; }
+  .chip {
+    flex-shrink: 0; padding: 4px 10px; border-radius: 12px;
+    font-size: 11px; border: 1px solid var(--border);
+    background: transparent; color: var(--muted); cursor: pointer;
+    transition: all 0.2s;
+  }
+  .chip.active { color: white; }
+  .chip[data-filter="全部"].active { background: var(--teal); border-color: var(--teal); }
+  .chip[data-filter="灵感"].active { background: var(--amber); border-color: var(--amber); }
+  .chip[data-filter="行业"].active { background: var(--blue); border-color: var(--blue); }
+  .chip[data-filter="客户"].active { background: var(--teal); border-color: var(--teal); }
+  .chip[data-filter="话术"].active { background: var(--purple); border-color: var(--purple); }
+  .chip[data-filter="常识"].active { background: var(--orange); border-color: var(--orange); }
+  .chip[data-filter="待办"].active { background: var(--red); border-color: var(--red); }
+  .chip[data-filter="⭐"].active { background: #B45309; border-color: #B45309; }
+
+  /* ── Notes list ── */
+  .notes-list { display: flex; flex-direction: column; gap: 10px; }
+  .note-card {
+    background: var(--card); border-radius: 10px;
+    padding: 12px; border: 1px solid var(--border);
+    position: relative; transition: border-color 0.2s;
+  }
+  .note-card.starred { border-color: var(--amber); }
+  .note-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+  .note-cat {
+    font-size: 10px; font-weight: 700; padding: 2px 8px;
+    border-radius: 8px; color: white;
+  }
+  .note-cat.灵感 { background: var(--amber); }
+  .note-cat.行业 { background: var(--blue); }
+  .note-cat.客户 { background: var(--teal); }
+  .note-cat.话术 { background: var(--purple); }
+  .note-cat.常识 { background: var(--orange); }
+  .note-cat.待办 { background: var(--red); }
+  .note-meta { font-size: 10px; color: var(--muted); }
+  .note-text { font-size: 13px; line-height: 1.7; color: var(--text); white-space: pre-wrap; }
+  .note-actions { display: flex; gap: 8px; margin-top: 10px; justify-content: flex-end; }
+  .nact-btn {
+    background: var(--card2); border: 1px solid var(--border);
+    color: var(--muted); padding: 4px 10px; border-radius: 6px;
+    font-size: 11px; cursor: pointer; transition: all 0.2s;
+  }
+  .nact-btn:active { background: var(--border); }
+  .nact-btn.del:active { background: #7F1D1D; border-color: var(--red); color: var(--red); }
+  .star-indicator { font-size: 14px; }
+
+  /* ── Empty state ── */
+  .empty { text-align: center; padding: 40px 20px; color: var(--muted); }
+  .empty-icon { font-size: 40px; margin-bottom: 12px; }
+  .empty p { font-size: 13px; line-height: 1.6; }
+
+  /* ── Stats ── */
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+  .stat-card {
+    background: var(--card); border-radius: 10px;
+    padding: 12px 8px; text-align: center;
+    border: 1px solid var(--border);
+  }
+  .stat-num { font-size: 22px; font-weight: 700; color: var(--teal); }
+  .stat-label { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+  /* ── Pinned / Quick Notes ── */
+  .sec-label {
+    font-size: 10px; font-weight: 700; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 1px;
+    margin-bottom: 8px; margin-top: 4px;
+  }
+
+  /* ── FAB ── */
+  .fab {
+    position: fixed; bottom: calc(20px + var(--safe-bottom)); right: 20px;
+    width: 52px; height: 52px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--teal), var(--blue));
+    border: none; color: white; font-size: 24px;
+    cursor: pointer; box-shadow: 0 4px 16px rgba(29,158,117,0.4);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 300; transition: transform 0.2s;
+  }
+  .fab:active { transform: scale(0.92); }
+
+  /* ── Modal ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7); z-index: 400;
+    align-items: flex-end;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--card); width: 100%; border-radius: 16px 16px 0 0;
+    padding: 16px; padding-bottom: calc(16px + var(--safe-bottom));
+    max-height: 90vh; overflow-y: auto;
+  }
+  .modal-handle { width: 36px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 14px; }
+  .modal-title { font-size: 15px; font-weight: 700; margin-bottom: 14px; }
+  .modal-actions { display: flex; gap: 8px; margin-top: 12px; }
+  .modal-btn {
+    flex: 1; padding: 11px; border-radius: 8px; font-size: 14px;
+    font-weight: 600; border: none; cursor: pointer;
+  }
+  .modal-btn.primary { background: var(--teal); color: white; }
+  .modal-btn.secondary { background: var(--card2); color: var(--text); border: 1px solid var(--border); }
+  .modal-btn:active { opacity: 0.8; }
+
+  /* ── Edit area in modal ── */
+  .modal textarea { min-height: 120px; }
+
+  /* ── Toast ── */
+  .toast {
+    position: fixed; bottom: calc(80px + var(--safe-bottom)); left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #1D9E75; color: white; padding: 8px 18px;
+    border-radius: 20px; font-size: 13px; font-weight: 600;
+    opacity: 0; transition: all 0.3s; z-index: 500; white-space: nowrap;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* ── Quick preset buttons ── */
+  .preset-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+  .preset-btn {
+    padding: 4px 10px; border-radius: 12px; font-size: 11px;
+    background: var(--card2); border: 1px solid var(--border);
+    color: var(--muted); cursor: pointer;
+  }
+  .preset-btn:active { background: var(--border); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <h1>🧠 知识大脑</h1>
+    <p>Sharon · Vanlin CIGS · 随时记录</p>
+  </div>
+  <div class="header-right">
+    <button class="hbtn" onclick="exportNotes()">导出</button>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('capture', this)">✏️ 记录</div>
+  <div class="tab" onclick="switchTab('browse', this)">📋 浏览</div>
+  <div class="tab" onclick="switchTab('starred', this)">⭐ 收藏</div>
+  <div class="tab" onclick="switchTab('stats', this)">📊 统计</div>
+</div>
+
+<!-- ══════ CAPTURE TAB ══════ -->
+<div class="section active" id="capture">
+  <div class="input-card">
+    <div class="sec-label">选择分类</div>
+    <div class="input-row">
+      <button class="cat-btn active" data-cat="灵感" onclick="selectCat(this)">💡 灵感</button>
+      <button class="cat-btn" data-cat="行业" onclick="selectCat(this)">🌍 行业</button>
+      <button class="cat-btn" data-cat="客户" onclick="selectCat(this)">👤 客户</button>
+      <button class="cat-btn" data-cat="话术" onclick="selectCat(this)">💬 话术</button>
+      <button class="cat-btn" data-cat="常识" onclick="selectCat(this)">📚 常识</button>
+      <button class="cat-btn" data-cat="待办" onclick="selectCat(this)">✅ 待办</button>
+    </div>
+
+    <div class="sec-label" style="margin-top:10px">快捷模板</div>
+    <div class="preset-row">
+      <button class="preset-btn" onclick="insertPreset('客户线索：[名字] [公司] [职位] [需求]')">👤 客户线索</button>
+      <button class="preset-btn" onclick="insertPreset('竞品情报：[公司] [产品] [价格/动态]')">🔍 竞品情报</button>
+      <button class="preset-btn" onclick="insertPreset('买家问题：[问题内容]\n我的回答：')">❓ 买家问题</button>
+      <button class="preset-btn" onclick="insertPreset('市场动态：[来源] [内容] [对我们的影响]')">📈 市场动态</button>
+      <button class="preset-btn" onclick="insertPreset('好的话术：\n场景：\n说法：')">💬 好话术</button>
+    </div>
+
+    <textarea id="noteInput" placeholder="写下你的想法、灵感、客户信息、行业动态..." oninput="updateCount()"></textarea>
+
+    <div class="input-footer">
+      <div style="display:flex; align-items:center; gap:10px">
+        <div class="star-row">
+          <button class="star-btn" id="starBtn" onclick="toggleStar()" title="标记重要">⭐</button>
+        </div>
+        <span class="char-count" id="charCount">0 字</span>
+      </div>
+      <button class="save-btn" onclick="saveNote()">保存</button>
+    </div>
+  </div>
+
+  <!-- Recent notes preview -->
+  <div class="sec-label">最近记录</div>
+  <div id="recentList" class="notes-list"></div>
+</div>
+
+<!-- ══════ BROWSE TAB ══════ -->
+<div class="section" id="browse">
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input class="search-input" id="searchInput" placeholder="搜索笔记..." oninput="renderBrowse()">
+  </div>
+  <div class="filter-row">
+    <button class="chip active" data-filter="全部" onclick="setFilter('全部', this)">全部</button>
+    <button class="chip" data-filter="灵感" onclick="setFilter('灵感', this)">💡 灵感</button>
+    <button class="chip" data-filter="行业" onclick="setFilter('行业', this)">🌍 行业</button>
+    <button class="chip" data-filter="客户" onclick="setFilter('客户', this)">👤 客户</button>
+    <button class="chip" data-filter="话术" onclick="setFilter('话术', this)">💬 话术</button>
+    <button class="chip" data-filter="常识" onclick="setFilter('常识', this)">📚 常识</button>
+    <button class="chip" data-filter="待办" onclick="setFilter('待办', this)">✅ 待办</button>
+  </div>
+  <div id="browseList" class="notes-list"></div>
+</div>
+
+<!-- ══════ STARRED TAB ══════ -->
+<div class="section" id="starred">
+  <div class="sec-label">⭐ 重要标记的笔记</div>
+  <div id="starredList" class="notes-list"></div>
+</div>
+
+<!-- ══════ STATS TAB ══════ -->
+<div class="section" id="stats">
+  <div class="stats-grid" id="statsGrid"></div>
+  <div class="sec-label">分类分布</div>
+  <div id="catStats" class="notes-list"></div>
+  <div style="margin-top:16px">
+    <div class="sec-label">操作</div>
+    <div style="display:flex; gap:8px; flex-direction:column">
+      <button onclick="exportNotes()" style="background:var(--card2);border:1px solid var(--border);color:var(--text);padding:12px;border-radius:8px;font-size:13px;cursor:pointer">📤 导出所有笔记（文本）</button>
+      <button onclick="clearAll()" style="background:var(--card2);border:1px solid var(--red);color:var(--red);padding:12px;border-radius:8px;font-size:13px;cursor:pointer">🗑 清空所有笔记</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ FAB ══════ -->
+<button class="fab" onclick="openModal()" title="快速记录">+</button>
+
+<!-- ══════ QUICK MODAL ══════ -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">⚡ 快速记录</div>
+    <div class="input-row" id="modalCatRow">
+      <button class="cat-btn active" data-cat="灵感" onclick="selectModalCat(this)">💡 灵感</button>
+      <button class="cat-btn" data-cat="行业" onclick="selectModalCat(this)">🌍 行业</button>
+      <button class="cat-btn" data-cat="客户" onclick="selectModalCat(this)">👤 客户</button>
+      <button class="cat-btn" data-cat="话术" onclick="selectModalCat(this)">💬 话术</button>
+      <button class="cat-btn" data-cat="常识" onclick="selectModalCat(this)">📚 常识</button>
+      <button class="cat-btn" data-cat="待办" onclick="selectModalCat(this)">✅ 待办</button>
+    </div>
+    <textarea id="modalInput" placeholder="快速记下脑海中的想法..."></textarea>
+    <div class="modal-actions">
+      <button class="modal-btn secondary" onclick="closeModal()">取消</button>
+      <button class="modal-btn primary" onclick="saveModal()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ EDIT MODAL ══════ -->
+<div class="modal-overlay" id="editOverlay" onclick="closeEditOutside(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">✏️ 编辑笔记</div>
+    <div class="input-row" id="editCatRow">
+      <button class="cat-btn active" data-cat="灵感" onclick="selectEditCat(this)">💡 灵感</button>
+      <button class="cat-btn" data-cat="行业" onclick="selectEditCat(this)">🌍 行业</button>
+      <button class="cat-btn" data-cat="客户" onclick="selectEditCat(this)">👤 客户</button>
+      <button class="cat-btn" data-cat="话术" onclick="selectEditCat(this)">💬 话术</button>
+      <button class="cat-btn" data-cat="常识" onclick="selectEditCat(this)">📚 常识</button>
+      <button class="cat-btn" data-cat="待办" onclick="selectEditCat(this)">✅ 待办</button>
+    </div>
+    <textarea id="editInput" placeholder="编辑内容..."></textarea>
+    <div class="modal-actions">
+      <button class="modal-btn secondary" onclick="closeEdit()">取消</button>
+      <button class="modal-btn primary" onclick="saveEdit()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ TOAST ══════ -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Data ──
+const STORAGE_KEY = 'sharon_brain_v1';
+let notes = [];
+let currentCat = '灵感';
+let modalCat = '灵感';
+let editCat = '灵感';
+let isStarred = false;
+let currentFilter = '全部';
+let editingId = null;
+
+function load() {
+  try {
+    const d = localStorage.getItem(STORAGE_KEY);
+    notes = d ? JSON.parse(d) : [];
+  } catch(e) { notes = []; }
+}
+
+function save() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+}
+
+function genId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+}
+
+function fmtDate(ts) {
+  const d = new Date(ts);
+  const now = new Date();
+  const diff = now - d;
+  if (diff < 60000) return '刚刚';
+  if (diff < 3600000) return Math.floor(diff/60000) + '分钟前';
+  if (diff < 86400000) return Math.floor(diff/3600000) + '小时前';
+  if (diff < 604800000) return Math.floor(diff/86400000) + '天前';
+  return `${d.getMonth()+1}/${d.getDate()}`;
+}
+
+// ── Cat selection ──
+function selectCat(btn) {
+  document.querySelectorAll('#capture .cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentCat = btn.dataset.cat;
+}
+
+function selectModalCat(btn) {
+  document.querySelectorAll('#modalCatRow .cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  modalCat = btn.dataset.cat;
+}
+
+function selectEditCat(btn) {
+  document.querySelectorAll('#editCatRow .cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  editCat = btn.dataset.cat;
+}
+
+// ── Star ──
+function toggleStar() {
+  isStarred = !isStarred;
+  document.getElementById('starBtn').classList.toggle('on', isStarred);
+}
+
+// ── Char count ──
+function updateCount() {
+  const len = document.getElementById('noteInput').value.length;
+  document.getElementById('charCount').textContent = len + ' 字';
+}
+
+// ── Preset ──
+function insertPreset(text) {
+  const ta = document.getElementById('noteInput');
+  ta.value = text;
+  ta.focus();
+  updateCount();
+}
+
+// ── Save ──
+function saveNote() {
+  const text = document.getElementById('noteInput').value.trim();
+  if (!text) { showToast('请输入内容'); return; }
+  const note = { id: genId(), text, cat: currentCat, starred: isStarred, ts: Date.now() };
+  notes.unshift(note);
+  save();
+  document.getElementById('noteInput').value = '';
+  isStarred = false;
+  document.getElementById('starBtn').classList.remove('on');
+  updateCount();
+  renderRecent();
+  if (document.getElementById('browse').classList.contains('active')) renderBrowse();
+  if (document.getElementById('starred').classList.contains('active')) renderStarred();
+  if (document.getElementById('stats').classList.contains('active')) renderStats();
+  showToast('✅ 已保存');
+}
+
+// ── Modal ──
+function openModal() {
+  document.getElementById('modalOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('modalInput').focus(), 100);
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  document.getElementById('modalInput').value = '';
+}
+
+function closeModalOutside(e) {
+  if (e.target === document.getElementById('modalOverlay')) closeModal();
+}
+
+function saveModal() {
+  const text = document.getElementById('modalInput').value.trim();
+  if (!text) { showToast('请输入内容'); return; }
+  const note = { id: genId(), text, cat: modalCat, starred: false, ts: Date.now() };
+  notes.unshift(note);
+  save();
+  closeModal();
+  renderRecent();
+  if (document.getElementById('browse').classList.contains('active')) renderBrowse();
+  showToast('✅ 已保存');
+}
+
+// ── Edit ──
+function openEdit(id) {
+  const note = notes.find(n => n.id === id);
+  if (!note) return;
+  editingId = id;
+  editCat = note.cat;
+  document.getElementById('editInput').value = note.text;
+  document.querySelectorAll('#editCatRow .cat-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.cat === note.cat);
+  });
+  document.getElementById('editOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('editInput').focus(), 100);
+}
+
+function closeEdit() {
+  document.getElementById('editOverlay').classList.remove('open');
+  editingId = null;
+}
+
+function closeEditOutside(e) {
+  if (e.target === document.getElementById('editOverlay')) closeEdit();
+}
+
+function saveEdit() {
+  const text = document.getElementById('editInput').value.trim();
+  if (!text || !editingId) return;
+  const idx = notes.findIndex(n => n.id === editingId);
+  if (idx >= 0) {
+    notes[idx].text = text;
+    notes[idx].cat = editCat;
+    save();
+  }
+  closeEdit();
+  renderAll();
+  showToast('✅ 已更新');
+}
+
+// ── Delete ──
+function deleteNote(id) {
+  if (!confirm('确认删除这条笔记？')) return;
+  notes = notes.filter(n => n.id !== id);
+  save();
+  renderAll();
+  showToast('🗑 已删除');
+}
+
+// ── Toggle star ──
+function toggleNotestar(id) {
+  const note = notes.find(n => n.id === id);
+  if (note) { note.starred = !note.starred; save(); renderAll(); }
+}
+
+// ── Copy ──
+function copyNote(id) {
+  const note = notes.find(n => n.id === id);
+  if (!note) return;
+  navigator.clipboard.writeText(note.text).then(() => showToast('📋 已复制'));
+}
+
+// ── Render note card ──
+function noteCard(note) {
+  const catEmoji = {灵感:'💡',行业:'🌍',客户:'👤',话术:'💬',常识:'📚',待办:'✅'}[note.cat] || '📝';
+  const preview = note.text.length > 150 ? note.text.slice(0,150) + '...' : note.text;
+  return `
+    <div class="note-card ${note.starred ? 'starred' : ''}">
+      <div class="note-header">
+        <span class="note-cat ${note.cat}">${catEmoji} ${note.cat}</span>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span class="star-indicator" style="cursor:pointer;opacity:${note.starred?1:0.3}" onclick="toggleNotestar('${note.id}')" title="标记重要">⭐</span>
+          <span class="note-meta">${fmtDate(note.ts)}</span>
+        </div>
+      </div>
+      <div class="note-text">${escHtml(preview)}</div>
+      <div class="note-actions">
+        <button class="nact-btn" onclick="copyNote('${note.id}')">复制</button>
+        <button class="nact-btn" onclick="openEdit('${note.id}')">编辑</button>
+        <button class="nact-btn del" onclick="deleteNote('${note.id}')">删除</button>
+      </div>
+    </div>`;
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+}
+
+// ── Render sections ──
+function renderRecent() {
+  const el = document.getElementById('recentList');
+  const recent = notes.slice(0, 5);
+  if (!recent.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">✏️</div><p>还没有记录<br>写下你的第一个想法吧！</p></div>';
+    return;
+  }
+  el.innerHTML = recent.map(noteCard).join('');
+}
+
+function renderBrowse() {
+  const el = document.getElementById('browseList');
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  let filtered = notes;
+  if (currentFilter !== '全部') filtered = filtered.filter(n => n.cat === currentFilter);
+  if (q) filtered = filtered.filter(n => n.text.toLowerCase().includes(q) || n.cat.toLowerCase().includes(q));
+  if (!filtered.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">🔍</div><p>没有找到匹配的笔记</p></div>';
+    return;
+  }
+  el.innerHTML = filtered.map(noteCard).join('');
+}
+
+function renderStarred() {
+  const el = document.getElementById('starredList');
+  const starred = notes.filter(n => n.starred);
+  if (!starred.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">⭐</div><p>还没有收藏的笔记<br>点击笔记上的⭐标记重要内容</p></div>';
+    return;
+  }
+  el.innerHTML = starred.map(noteCard).join('');
+}
+
+function renderStats() {
+  const total = notes.length;
+  const starred = notes.filter(n => n.starred).length;
+  const cats = ['灵感','行业','客户','话术','常识','待办'];
+  const today = notes.filter(n => {
+    const d = new Date(n.ts);
+    const now = new Date();
+    return d.toDateString() === now.toDateString();
+  }).length;
+
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="stat-card"><div class="stat-num">${total}</div><div class="stat-label">总笔记</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--amber)">${starred}</div><div class="stat-label">已收藏</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--orange)">${today}</div><div class="stat-label">今日记录</div></div>
+  `;
+
+  const catColors = {灵感:'var(--amber)',行业:'var(--blue)',客户:'var(--teal)',话术:'var(--purple)',常识:'var(--orange)',待办:'var(--red)'};
+  const catEmoji = {灵感:'💡',行业:'🌍',客户:'👤',话术:'💬',常识:'📚',待办:'✅'};
+
+  document.getElementById('catStats').innerHTML = cats.map(cat => {
+    const count = notes.filter(n => n.cat === cat).length;
+    const pct = total ? Math.round(count/total*100) : 0;
+    return `
+      <div class="note-card">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:13px">${catEmoji[cat]} ${cat}</span>
+          <span style="font-size:13px;font-weight:700;color:${catColors[cat]}">${count} 条</span>
+        </div>
+        <div style="margin-top:8px;background:var(--card2);border-radius:4px;height:4px">
+          <div style="width:${pct}%;height:4px;background:${catColors[cat]};border-radius:4px;transition:width 0.5s"></div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function renderAll() {
+  renderRecent();
+  renderBrowse();
+  renderStarred();
+  renderStats();
+}
+
+// ── Filter ──
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-row .chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  renderBrowse();
+}
+
+// ── Tab switch ──
+function switchTab(id, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  el.classList.add('active');
+  if (id === 'browse') renderBrowse();
+  if (id === 'starred') renderStarred();
+  if (id === 'stats') renderStats();
+}
+
+// ── Export ──
+function exportNotes() {
+  if (!notes.length) { showToast('没有笔记可以导出'); return; }
+  const text = notes.map(n =>
+    `[${n.cat}] ${new Date(n.ts).toLocaleString('zh-CN')}${n.starred?' ⭐':''}\n${n.text}\n`
+  ).join('\n---\n\n');
+  const blob = new Blob([text], {type:'text/plain;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `Sharon_知识大脑_${new Date().toLocaleDateString('zh-CN').replace(/\//g,'-')}.txt`;
+  a.click();
+  showToast('📤 导出成功');
+}
+
+// ── Clear all ──
+function clearAll() {
+  if (!confirm('确认清空所有笔记？此操作不可恢复！')) return;
+  notes = [];
+  save();
+  renderAll();
+  showToast('已清空');
+}
+
+// ── Toast ──
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// ── Init ──
+load();
+renderRecent();
+
+// Pre-populate with a welcome note if empty
+if (notes.length === 0) {
+  notes = [
+    {
+      id: genId(),
+      text: '欢迎使用知识大脑！\n\n用来记录：\n💡 灵感 — 随时闪过的想法\n🌍 行业 — CIGS/太阳能行业动态\n👤 客户 — 买家信息、跟进记录\n💬 话术 — 好用的英文回复\n📚 常识 — 需要记住的知识点\n✅ 待办 — 明天要做的事\n\n点右下角 + 可以快速记录！',
+      cat: '常识',
+      starred: true,
+      ts: Date.now()
+    }
+  ];
+  save();
+  renderRecent();
+}
+</script>
+</body>
+</html>

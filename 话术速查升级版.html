@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sharon 话术速查 v2</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: #0F1923;
+    color: #E8EDF2;
+    width: 320px;
+    min-height: 100vh;
+    font-size: 13px;
+  }
+  .header {
+    background: linear-gradient(135deg, #1D6FA4, #1D9E75);
+    padding: 12px 14px 10px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-title { font-size: 15px; font-weight: 700; color: white; }
+  .header-sub { font-size: 10px; color: rgba(255,255,255,0.7); margin-top: 2px; }
+  .tabs {
+    display: flex;
+    background: #1A2535;
+    border-bottom: 1px solid #2A3A4A;
+    overflow-x: auto;
+  }
+  .tab {
+    flex: 1; padding: 9px 4px; text-align: center;
+    font-size: 10px; color: #6B8099; cursor: pointer;
+    border-bottom: 2px solid transparent; white-space: nowrap;
+    transition: all 0.2s; min-width: 50px;
+  }
+  .tab.active { color: #1D9E75; border-bottom-color: #1D9E75; background: #1E2D3D; }
+  .tab:hover { color: #A8C4D8; }
+  .section { display: none; padding: 10px 12px; }
+  .section.active { display: block; }
+  .card {
+    background: #1A2535; border-radius: 8px;
+    margin-bottom: 8px; overflow: hidden;
+    border: 1px solid #2A3A4A;
+  }
+  .card-header {
+    padding: 8px 12px; font-size: 11px; font-weight: 600;
+    cursor: pointer; display: flex; justify-content: space-between;
+    align-items: center; user-select: none;
+  }
+  .card-header:hover { background: rgba(255,255,255,0.05); }
+  .card-header .arrow { font-size: 10px; transition: transform 0.2s; color: #6B8099; }
+  .card-header.open .arrow { transform: rotate(90deg); }
+  .card-body { display: none; padding: 10px 12px; border-top: 1px solid #2A3A4A; line-height: 1.6; }
+  .card-body.open { display: block; }
+  .tag-blue .card-header { border-left: 3px solid #1D9E75; }
+  .tag-amber .card-header { border-left: 3px solid #F59E0B; }
+  .tag-purple .card-header { border-left: 3px solid #8B5CF6; }
+  .tag-red .card-header { border-left: 3px solid #EF4444; }
+  .tag-teal .card-header { border-left: 3px solid #06B6D4; }
+  .tag-orange .card-header { border-left: 3px solid #F97316; }
+  .copy-btn {
+    background: #1D9E75; color: white; border: none;
+    border-radius: 4px; padding: 4px 10px; font-size: 10px;
+    cursor: pointer; margin-top: 8px; display: block;
+    width: 100%; text-align: center; transition: background 0.2s;
+  }
+  .copy-btn:hover { background: #15805E; }
+  .copy-btn.copied { background: #374151; }
+  .en-text { color: #7DD3B0; font-style: italic; font-size: 12px; line-height: 1.7; white-space: pre-wrap; }
+  .cn-text { color: #94B8CC; font-size: 11px; margin-top: 6px; line-height: 1.6; }
+  .label { font-size: 10px; font-weight: 600; color: #6B8099; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .highlight {
+    background: #1D9E7520; border-left: 2px solid #1D9E75;
+    padding: 6px 8px; border-radius: 0 4px 4px 0;
+    margin: 6px 0; font-size: 12px; color: #A8D8C0;
+  }
+  .highlight-amber {
+    background: #F59E0B20; border-left: 2px solid #F59E0B;
+    padding: 6px 8px; border-radius: 0 4px 4px 0;
+    margin: 6px 0; font-size: 12px; color: #FCD34D;
+  }
+  .spec-row {
+    display: flex; justify-content: space-between;
+    padding: 4px 0; border-bottom: 1px solid #2A3A4A; font-size: 11px;
+  }
+  .spec-row:last-child { border-bottom: none; }
+  .spec-key { color: #6B8099; }
+  .spec-val { color: #E8EDF2; font-weight: 600; }
+  .check-item {
+    padding: 5px 0; display: flex; gap: 8px;
+    font-size: 12px; align-items: flex-start;
+    border-bottom: 1px solid #2A3A4A20;
+  }
+  .check-item:last-child { border-bottom: none; }
+  .check-dot { color: #1D9E75; font-size: 14px; flex-shrink: 0; }
+  .check-dot.warn { color: #F59E0B; }
+  .check-dot.no { color: #EF4444; }
+  .sec-title {
+    font-size: 10px; font-weight: 700; color: #6B8099;
+    text-transform: uppercase; letter-spacing: 1px; padding: 4px 0 8px;
+  }
+  hr { border: none; border-top: 1px solid #2A3A4A; margin: 8px 0; }
+  .phase-badge {
+    display: inline-block; padding: 2px 8px; border-radius: 10px;
+    font-size: 10px; font-weight: 700; margin-bottom: 6px;
+  }
+  .phase-now { background: #1D9E7530; color: #1D9E75; }
+  .phase-mid { background: #F59E0B30; color: #F59E0B; }
+  .phase-late { background: #8B5CF630; color: #8B5CF6; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-title">⚡ Sharon 话术速查 v2</div>
+  <div class="header-sub">Vanlin CIGS · 0-6个月作战版 · 随时可用</div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('huashu', this)">💬 话术</div>
+  <div class="tab" onclick="switchTab('zhishi', this)">📚 知识</div>
+  <div class="tab" onclick="switchTab('chanpin', this)">📦 产品</div>
+  <div class="tab" onclick="switchTab('jieri', this)">🗓 节奏</div>
+  <div class="tab" onclick="switchTab('shichang', this)">📊 市场</div>
+</div>
+
+<!-- ══════════════ 话术 TAB ══════════════ -->
+<div class="section active" id="huashu">
+
+  <div class="sec-title">核心定位金句</div>
+  <div class="card tag-teal">
+    <div class="card-header" onclick="toggle(this)">
+      💡 Not a replacement. An enabler. <span class="arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <div class="highlight">"CIGS flexible panels unlock solar power where solar couldn't go before."</div>
+      <div class="en-text" id="enabler">CIGS flexible panels don't replace crystalline silicon for standard rooftops. They enable solar power to go where it couldn't go before — curved, lightweight, and portable surfaces. When portability, weight savings, and conformability are the priority, CIGS is the outstanding choice.</div>
+      <div class="cn-text">CIGS不是替代晶硅，而是让太阳能去到晶硅去不了的地方。</div>
+      <button class="copy-btn" onclick="copyText('enabler', this)">复制英文</button>
+    </div>
+  </div>
+
+  <hr>
+  <div class="sec-title">LinkedIn 连接请求（200字符内）</div>
+
+  <div class="card tag-blue">
+    <div class="card-header" onclick="toggle(this)">🚐 RV经销商 <span class="arrow">▶</span></div>
+    <div class="card-body">
+      <div class="en-text" id="rv-connect">Hi [Name], I supply CIGS flexible solar modules (70W–510W), VDE certified, factory direct from China. Would love to connect — great fit for RV rooftop applications.</div>
+      <button class="copy-btn" onclick="copyText('rv-connect', this)">复制</button>
+    </div>
+  </div>
+
+  <div class="card tag-blue">
+    <div class="card-header" onclick="toggle(this)">⛵ 游艇/海洋买家 <span class="arrow">▶</span></div>
+    <div class="card-body">
+      <div class="en-text" id="marine-connect">Hi [Name], I manufacture CIGS flexible solar modules — ultralight (1.7kg/m²), custom shapes for curved hull applications. VDE certified, factory direct. Would love to connect.</div>
+      <button class="copy-btn" onclick="copyText('marine-connect', this)">复制</button>
+    </div>
+  </div>
+
+  <div class="card tag-blue">
+    <div class="card-header" onclick="toggle(this)">🏢 BIPV承包商 <span class="arrow">▶</span></div>
+    <div class="card-body">
+      <div class="en-text" id="bipv-connect">Hi [Name], I supply CIGS flexible thin-film solar for BIPV — custom sizes, semi-transparent options, VDE certified. Factory direct from Anhui, China. Would love to connect.</div>
+      <button class="copy-btn" onclick="copyText('bipv-connect', this)">复制</button>
+    </div>
+  </div>
+
+  <div class="card tag-blue">
+    <div class="card-header" onclick="toggle(this)">🏙 智慧城市/路灯采购 <span class="arrow">▶</span></div>
+    <div class="card-body">
+      <div class="en-text" id="streetlamp-connect">Hi [Name], I noticed your work in smart city / street lighting. We manufacture solar street lamps with CIGS thin-film cells wrapped directly onto the cylindrical pole — no separate panel needed. Would love to connect.</div>
+      <button class="copy-btn" onclick="copyText('streetlamp-connect', this)">复制</button>
+    </div>
+  </div>
+
+  <hr>
+  <div class="sec-title">询盘回复模板</div>
+
+  <div class="card tag-amber">
+    <div class="card-header" onclick="toggle(this)">📩 收到询盘 <span class="arrow">▶</span></div>
+    <div class="card-body">
+      <div class="en-text" id="inquiry">Thank you for your inquiry. I'm Sharon from Vanlin Products, specializing in CIGS flexible thin-film solar modules. Could you share your application — surface type, power requirement, and target market? I'll recommend the most suitable product.</div>
+      <div class="cn-text">感谢询盘。请告诉我您的应用场景——安装表面、功率需求、目标市场？我来推荐最合适的产品。</div>
+      <button class="copy-btn" onclick="copyText('inquiry', this)">复制英文</button>
+    </div>
+  </div>
+
+  <div class="card tag-amber">
+    <div class="card-header" onclick="toggle(this)">💰 被问价格 <span class="arrow">▶</span></div>
+    <div class="card-body">
+      <div class="en-text" id="price">Price depends on model, quantity, and destination. Could you share your target quantity and delivery address? I'll prepare a formal quotation within 24 hours.</div>
+      <div class="cn-text">价格取决于型号、数量和目的地。请告诉我目标数量和交货地址？24小时内发正式报价单。</div>
+      <button class="copy-btn" onclick="copyText('price', this)">复制英文</button>
+    </div>
+  </div>
+
+  <div class="card tag-amber">
+    <div class="card-header" onclick="toggle(this)">📋 被问认证 <span class="arrow">▶</span></div>
+    <div class="card-body">
+      <div class="en-text" id="cert">Our modules are VDE certified (Germany), ISO 9001/14001/45001, and IQNET recognized. I can share the full certification documents — please send me your email.</div>
+      <div class="cn-text">VDE认证（德国）、ISO 9001/14001/45001、IQNET互认。可发完整证书——请给我您的邮箱。</div>
+      <button class="copy-btn" onclick="copyText('cert', this)">复制英文</button>
+    </div>
+  </div>
+
+  <div class="card tag-amber">
+    <div class="card-header" onclick="toggle(this)">🚚 被问交期 <span class="arrow">▶</span></div>
+    <div class="card-body">
+      <div class="en-text" id="leadtime">Standard lead time is [X] weeks after order confirmation and deposit received. For urgent orders, please share your required delivery date and I'll check our production schedule.</div>
+      <div class="cn-text">标准交货期：订单确认+定金后[X]周。紧急订单请告知需要的交货日期，我来确认排期。</div>
+      <button class="copy-btn" onclick="copyText('leadtime', this)">复制英文</button>
+    </div>
+  </div>
+
+  <div class="card tag-amber">
+    <div class="card-header" onclick="toggle(this)">📞 被要求打电话 <span class="arrow">▶</span></div>
+    <div class="card-body">
+      <div class="en-text" id="nocall">I'd prefer to keep it to messages for now — easier to share specs and references. Happy to answer any questions here!</div>
+      <div class="cn-text">我倾向于先通过文字沟通，方便分享规格和资料。有任何问题都可以在这里问我！</div>
+      <button class="copy-btn" onclick="copyText('nocall', this)">复制英文</button>
+    </div>
+  </div>
+
+  <hr>
+  <div class="sec-title">价格 & 产品异议处理</div>
+
+  <div class="card tag-purple">
+    <div class="card-header" onclick="toggle(this)">⚖️ "晶硅更便宜" <span class="arrow">▶</span></div>
+    <div class="card-body">
+      <div class="en-text" id="vs-mono">You're right — crystalline silicon is cheaper per watt on flat rooftops. But if your surface is curved, weight-sensitive, or architecturally constrained, crystalline simply can't be used. The question isn't which is cheaper — it's which one actually works for your application.</div>
+      <div class="cn-text">晶硅确实每瓦更便宜。但如果您的表面是曲面、重量敏感或有结构限制，晶硅根本装不上去。问题不是哪个便宜——而是哪个能用。</div>
+      <button class="copy-btn" onclick="copyText('vs-mono', this)">复制英文</button>
+    </div>
+  </div>
+
+  <div class="card tag-purple">
+    <div class="card-header" onclick="toggle(this)">📉 "效率比晶硅低" <span class="arrow">▶</span></div>
+    <div class="card-body">
+      <div class="en-text" id="efficiency">Efficiency ratings are lab numbers. In real conditions — heat, shade, diffuse light — CIGS maintains output where crystalline drops significantly. On a 65°C rooftop, our 100W panel outputs 84.8W vs 82W for mono. And we fit surfaces mono panels can't reach at all.</div>
+      <div class="cn-text">效率是实验室数据。65°C屋顶，我们100W板实际84.8W，晶硅只有82W。而且我们能装在晶硅装不了的地方。</div>
+      <button class="copy-btn" onclick="copyText('efficiency', this)">复制英文</button>
+    </div>
+  </div>
+
+  <div class="card tag-purple">
+    <div class="card-header" onclick="toggle(this)">⏳ "保质期比晶硅短" <span class="arrow">▶</span></div>
+    <div class="card-body">
+      <div class="highlight-amber">⚠️ 买家一定会问，必须准备好</div>
+      <div class="en-text" id="warranty">You're right that flexible modules use polymer encapsulation rather than glass — the trade-off is intentional. Where weight and flexibility matter more than a 30-year static installation, CIGS is the right tool. For permanent rooftop installations, rigid panels win. For RV, marine, and portable applications, a 10-year warranty covers the typical use cycle perfectly.</div>
+      <div class="cn-text">柔性模组用聚合物封装而非玻璃，这是有意为之的取舍。永久屋顶装晶硅赢，RV/船舶/便携场景10年质保完全够用。</div>
+      <button class="copy-btn" onclick="copyText('warranty', this)">复制英文</button>
+    </div>
+  </div>
+
+  <div class="card tag-purple">
+    <div class="card-header" onclick="toggle(this)">🔄 "能反复弯曲吗" <span class="arrow">▶</span></div>
+    <div class="card-body">
+      <div class="en-text" id="bending">Our modules are designed for conforming to a fixed curved surface, not for dynamic repeated flexing. Once adhered to your RV roof or boat deck, they stay in that shape — no repeated bending stress. This is how they're intended to be used and why they perform reliably.</div>
+      <div class="cn-text">我们的模组设计用于贴合固定曲面，不是用于反复弯折。粘贴到RV屋顶或船面后保持形状，没有反复弯曲应力，这是正确使用方式。</div>
+      <button class="copy-btn" onclick="copyText('bending', this)">复制英文</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ 知识 TAB ══════════════ -->
+<div class="section" id="zhishi">
+
+  <div class="sec-title">CIGS 核心参数</div>
+  <div class="card tag-teal">
+    <div class="card-header" onclick="toggle(this)">🔬 CIGS是什么 <span class="arrow">▶</span></div>
+    <div class="card-body">
+      <div class="highlight">全名：Copper Indium Gallium Selenide（铜铟镓硒）</div>
+      <div class="cn-text">四种金属元素直接沉积在柔性基底上，天生柔性轻薄，不是硅片切出来的。薄膜层只有1-2微米厚（人类头发的1/100），却能吸收大部分阳光。</div>
+      <hr>
+      <div class="spec-row"><span class="spec-key">厚度</span><span class="spec-val">1.7mm</span></div>
+      <div class="spec-row"><span class="spec-key">重量</span><span class="spec-val">1.7 kg/m²</span></div>
+      <div class="spec-row"><span class="spec-key">弯曲半径</span><span class="spec-val">min 0.5m</span></div>
+      <div class="spec-row"><span class="spec-key">温度系数</span><span class="spec-val">-0.38%/°C</span></div>
+      <div class="spec-row"><span class="spec-key">效率范围</span><span class="spec-val">14.2–16.9%</span></div>
+      <div class="spec-row"><span class="spec-key">工作温度</span><span class="spec-val">-40°C ~ +85°C</span></div>
+    </div>
+  </div>
+
+  <div class="card tag-teal">
+    <div class="card-header" onclick="toggle(this)">⚡ 温度系数怎么解释 <span class="arrow">▶</span></div>
+    <div class="card-body">
+      <div class="cn-text">基准：25°C。温度每升高1°C，功率下降0.38%。</div>
+      <div class="highlight">夏天65°C屋顶（高出40°C）<br>CIGS: 100W × (1-40×0.38%) = <b>84.8W</b><br>晶硅: 100W × (1-40×0.45%) = <b>82W</b><br>天气越热，CIGS优势越明显</div>
+    </div>
+  </div>
+
+  <div class="card tag-teal">
+    <div class="card-header" onclick="toggle(this)">✅ 认证列表 <span class="arrow">▶</span></div>
+    <div class="card-body">
+      <div class="check-item"><span class="check-dot">✅</span><span><b>VDE</b> — 德国，欧洲市场最权威 ⭐</span></div>
+      <div class="check-item"><span class="check-dot">✅</span><span><b>ISO 9001</b> — 质量管理</span></div>
+      <div class="check-item"><span class="check-dot">✅</span><span><b>ISO 14001</b> — 环境管理</span></div>
+      <div class="check-item"><span class="check-dot">✅</span><span><b>ISO 45001</b> — 职业安全</span></div>
+      <div class="check-item"><span class="check-dot">✅</span><span><b>IQNET</b> — 国际互认</span></div>
+      <div class="check-item"><span class="check-dot">✅</span><span><b>碳足迹证书</b> — 欧洲绿色采购加分</span></div>
+    </div>
+  </div>
+
+  <div class="card tag-teal">
+    <div class="card-header" onclick="toggle(this)">🏆 竞品速览 <span class="arrow">▶</span></div>
+    <div class="card-body">
+      <div class="check-item"><span class="check-dot warn">⚠</span><span><b>Solar Frontier</b>（日本）— 2023停产，市场缺口 🎯</span></div>
+      <div class="check-item"><span class="check-dot warn">⚠</span><span><b>MiaSolé</b>（美国）— 价格高，交期长</span></div>
+      <div class="check-item"><span class="check-dot warn">⚠</span><span><b>Flisom</b>（瑞典）— 主攻航空，价格极高</span></div>
+      <div class="check-item"><span class="check-dot warn">⚠</span><span><b>Avancis</b>（德国）— 只做BIPV，不做柔性定制</span></div>
+      <div class="check-item"><span class="check-dot no">✗</span><span><b>BougeRV/Lensun</b> — 只做B2C，不做批发</span></div>
+      <div class="highlight">Vanlin机会：B2B批发 + 定制项目市场</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ 产品 TAB ══════════════ -->
+<div class="section" id="chanpin">
+
+  <div class="sec-title">🎯 0-6个月主推产品</div>
+
+  <div class="card tag-blue">
+    <div class="card-header" onclick="toggle(this)">N36 · 70–80W · 窄条 · RV首选 <span class="arrow">▶</span></div>
+    <div class="card-body">
+      <div class="spec-row"><span class="spec-key">尺寸</span><span class="spec-val">1709×348mm</span></div>
+      <div class="spec-row"><span class="spec-key">重量</span><span class="spec-val">1.2kg（无胶）</span></div>
+      <div class="spec-row"><span class="spec-key">效率</span><span class="spec-val">14.2–16.2%</span></div>
+      <div class="spec-row"><span class="spec-key">最佳场景</span><span class="spec-val">RV屋顶 / 游艇</span></div>
+      <div class="highlight">"1,709×348mm, only 1.2kg — adheres directly to curved RV rooftops, no drilling"</div>
+    </div>
+  </div>
+
+  <div class="card tag-blue">
+    <div class="card-header" onclick="toggle(this)">N56 · 110–125W · 长条 · 船舶 <span class="arrow">▶</span></div>
+    <div class="card-body">
+      <div class="spec-row"><span class="spec-key">尺寸</span><span class="spec-val">2583×348mm</span></div>
+      <div class="spec-row"><span class="spec-key">重量</span><span class="spec-val">1.7kg</span></div>
+      <div class="spec-row"><span class="spec-key">效率</span><span class="spec-val">14.3–16.3%</span></div>
+      <div class="spec-row"><span class="spec-key">最佳场景</span><span class="spec-val">船舶 / 长厢货车</span></div>
+    </div>
+  </div>
+
+  <div class="card tag-blue">
+    <div class="card-header" onclick="toggle(this)">M36 · 210–250W · 商用车 <span class="arrow">▶</span></div>
+    <div class="card-body">
+      <div class="spec-row"><span class="spec-key">尺寸</span><span class="spec-val">1709×973mm</span></div>
+      <div class="spec-row"><span class="spec-key">重量</span><span class="spec-val">2.9kg</span></div>
+      <div class="spec-row"><span class="spec-key">最佳场景</span><span class="spec-val">商用车 / 农业光伏</span></div>
+    </div>
+  </div>
+
+  <div class="card tag-blue">
+    <div class="card-header" onclick="toggle(this)">W36 · 280–320W · 宽幅 <span class="arrow">▶</span></div>
+    <div class="card-body">
+      <div class="spec-row"><span class="spec-key">尺寸</span><span class="spec-val">1709×1292mm</span></div>
+      <div class="spec-row"><span class="spec-key">重量</span><span class="spec-val">3.7kg</span></div>
+      <div class="spec-row"><span class="spec-key">最佳场景</span><span class="spec-val">平屋顶 / 车棚</span></div>
+    </div>
+  </div>
+
+  <div class="card tag-blue">
+    <div class="card-header" onclick="toggle(this)">M56 · 340–390W · 大长幅 <span class="arrow">▶</span></div>
+    <div class="card-body">
+      <div class="spec-row"><span class="spec-key">尺寸</span><span class="spec-val">2583×973mm</span></div>
+      <div class="spec-row"><span class="spec-key">重量</span><span class="spec-val">4.3kg</span></div>
+      <div class="spec-row"><span class="spec-key">最佳场景</span><span class="spec-val">大型船舶 / 工业</span></div>
+    </div>
+  </div>
+
+  <div class="card tag-blue">
+    <div class="card-header" onclick="toggle(this)">W56 · 440–510W · 旗舰 ⭐ <span class="arrow">▶</span></div>
+    <div class="card-body">
+      <div class="spec-row"><span class="spec-key">尺寸</span><span class="spec-val">2583×1292mm</span></div>
+      <div class="spec-row"><span class="spec-key">重量</span><span class="spec-val">5.7kg</span></div>
+      <div class="spec-row"><span class="spec-key">效率</span><span class="spec-val">最高16.6%</span></div>
+      <div class="spec-row"><span class="spec-key">最佳场景</span><span class="spec-val">工业 / BIPV</span></div>
+      <div class="highlight">510W仅重5.7kg — 旗舰产品</div>
+    </div>
+  </div>
+
+  <hr>
+  <div class="sec-title">系统集成产品（0-6个月同步推）</div>
+
+  <div class="card tag-amber">
+    <div class="card-header" onclick="toggle(this)">🏕 Solar Power Awning · 遮阳棚 ⭐⭐⭐⭐⭐ <span class="arrow">▶</span></div>
+    <div class="card-body">
+      <div class="highlight">RV市场独特产品！遮阳+发电一体</div>
+      <div class="spec-row"><span class="spec-key">功率</span><span class="spec-val">350W × 2</span></div>
+      <div class="spec-row"><span class="spec-key">尺寸</span><span class="spec-val">250×250cm</span></div>
+      <div class="spec-row"><span class="spec-key">测试</span><span class="spec-val">5000次卷收测试</span></div>
+      <div class="spec-row"><span class="spec-key">质保</span><span class="spec-val">2年</span></div>
+      <div class="spec-row"><span class="spec-key">适用</span><span class="spec-val">RV/Caravan/Trailer</span></div>
+      <div class="spec-row"><span class="spec-key">特色</span><span class="spec-val">集成LED灯，电动+手动控制</span></div>
+      <div class="en-text" id="awning-pitch" style="margin-top:8px">Our Solar Power Awning combines shade and power generation — CIGS panels integrated directly into the awning fabric. 350W×2, tested for 5,000+ roll cycles, with integrated LED lighting. Designed for RV, Caravan, and Trailer. No extra solar panels needed on the roof.</div>
+      <button class="copy-btn" onclick="copyText('awning-pitch', this)">复制介绍语</button>
+    </div>
+  </div>
+
+  <div class="card tag-orange">
+    <div class="card-header" onclick="toggle(this)">🏙 Solar Street Lamp · 圆柱路灯 ⭐⭐⭐⭐ <span class="arrow">▶</span></div>
+    <div class="card-body">
+      <div class="highlight">全球独特！CIGS薄膜直接包裹圆柱灯杆</div>
+      <div class="spec-row"><span class="spec-key">结构</span><span class="spec-val">Cylinder Solar Panel</span></div>
+      <div class="spec-row"><span class="spec-key">优势</span><span class="spec-val">360°发电，无遮挡死角</span></div>
+      <div class="spec-row"><span class="spec-key">特色</span><span class="spec-val">无玻璃，抗风，全天候</span></div>
+      <div class="spec-row"><span class="spec-key">控制</span><span class="spec-val">光感/时控/运动感应/IoT</span></div>
+      <div class="spec-row"><span class="spec-key">目标买家</span><span class="spec-val">智慧城市/市政/地产商</span></div>
+      <div class="en-text" id="lamp-pitch" style="margin-top:8px">Our Solar Street Lamp integrates CIGS thin-film cells directly onto the cylindrical lamp pole — no separate panel frame. All-in-one aesthetic design, lightweight, excellent low-light performance, off-grid capable. Smart control options: light sensor, motion detection, IoT monitoring.</div>
+      <button class="copy-btn" onclick="copyText('lamp-pitch', this)">复制介绍语</button>
+    </div>
+  </div>
+
+  <div class="card tag-blue">
+    <div class="card-header" onclick="toggle(this)">🎒 Solar Backpack · 蝴蝶系列 <span class="arrow">▶</span></div>
+    <div class="card-body">
+      <div class="spec-row"><span class="spec-key">款式A</span><span class="spec-val">8.3W / 5V1A / 1.25kg</span></div>
+      <div class="spec-row"><span class="spec-key">款式B</span><span class="spec-val">30W / 5V4A / 1.6kg</span></div>
+      <div class="spec-row"><span class="spec-key">适用天气</span><span class="spec-val">Sunny/Cloudy/Rainy</span></div>
+      <div class="spec-row"><span class="spec-key">场景</span><span class="spec-val">户外/露营/军事/旅行</span></div>
+      <div class="spec-row"><span class="spec-key">特色</span><span class="spec-val">YKK防水拉链·三层防划面板</span></div>
+    </div>
+  </div>
+
+  <div class="card tag-blue">
+    <div class="card-header" onclick="toggle(this)">🌊 Shallow Water Buoy · 海洋浮标 <span class="arrow">▶</span></div>
+    <div class="card-body">
+      <div class="highlight">圆形定制CIGS，全球极少竞品</div>
+      <div class="spec-row"><span class="spec-key">模组功率</span><span class="spec-val">317W</span></div>
+      <div class="spec-row"><span class="spec-key">浮标规格</span><span class="spec-val">长10m × 宽10m</span></div>
+      <div class="spec-row"><span class="spec-key">安装</span><span class="spec-val">直接粘贴，易维护</span></div>
+      <div class="spec-row"><span class="spec-key">目标买家</span><span class="spec-val">海洋监测机构/港口</span></div>
+    </div>
+  </div>
+
+  <hr>
+  <div class="sec-title">定制异形模组</div>
+  <div class="card tag-purple">
+    <div class="card-header" onclick="toggle(this)">🔵 圆形/异形/曲面定制 <span class="arrow">▶</span></div>
+    <div class="card-body">
+      <div class="check-item"><span class="check-dot">✅</span><span>圆形 Circular</span></div>
+      <div class="check-item"><span class="check-dot">✅</span><span>弧形 Arc-shaped</span></div>
+      <div class="check-item"><span class="check-dot">✅</span><span>多边形 Multi-sided</span></div>
+      <div class="check-item"><span class="check-dot">✅</span><span>条形 Strip</span></div>
+      <div class="highlight">应用：浮标、灯杆、车辆、建筑装饰</div>
+      <div class="en-text" id="custom-shape" style="margin-top:8px">We can manufacture custom-shaped CIGS modules — circular, curved, or multi-sided — to fit your specific application. Please share your dimensions and surface requirements.</div>
+      <button class="copy-btn" onclick="copyText('custom-shape', this)">复制英文</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ 节奏 TAB ══════════════ -->
+<div class="section" id="jieri">
+
+  <div class="sec-title">三阶段战略</div>
+
+  <div class="card tag-teal">
+    <div class="card-header" onclick="toggle(this)">
+      <span class="phase-badge phase-now">现在 0–6月</span> 核心战场 <span class="arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <div class="check-item"><span class="check-dot">🎯</span><span><b>CIGS柔性模组</b> — N/M/W系列，RV+游艇+BIPV</span></div>
+      <div class="check-item"><span class="check-dot">🎯</span><span><b>Solar Power Awning</b> — RV遮阳棚，北美市场</span></div>
+      <div class="check-item"><span class="check-dot">🎯</span><span><b>Solar Street Lamp</b> — 智慧城市，独特产品</span></div>
+      <div class="check-item"><span class="check-dot">🎯</span><span><b>Solar Backpack</b> — 户外/军事，DTC也可</span></div>
+      <div class="highlight">LinkedIn + 主动开发信 + SEO内容</div>
+    </div>
+  </div>
+
+  <div class="card tag-amber">
+    <div class="card-header" onclick="toggle(this)">
+      <span class="phase-badge phase-mid">中期 6–12月</span> 加入BIPV线 <span class="arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <div class="check-item"><span class="check-dot warn">📅</span><span><b>BIPV幕墙/瓦片</b> — 建筑师+承包商</span></div>
+      <div class="check-item"><span class="check-dot warn">📅</span><span><b>Solar Roller Shutter</b> — 建筑卷帘</span></div>
+      <div class="check-item"><span class="check-dot warn">📅</span><span><b>半透明薄膜模组</b> — 温室/阳光房</span></div>
+      <div class="highlight-amber">前提：LinkedIn有稳定询盘后再扩线</div>
+    </div>
+  </div>
+
+  <div class="card tag-purple">
+    <div class="card-header" onclick="toggle(this)">
+      <span class="phase-badge phase-late">长期 1年+</span> 特种产品 <span class="arrow">▶</span>
+    </div>
+    <div class="card-body">
+      <div class="check-item"><span class="check-dot">📅</span><span><b>Solar Buoy</b> — 海洋监测项目型销售</span></div>
+      <div class="check-item"><span class="check-dot">📅</span><span><b>Solar Smart Seat</b> — 市政采购，需要团队</span></div>
+      <div class="check-item"><span class="check-dot">📅</span><span><b>Solar Hut</b> — 展示性产品，展会用</span></div>
+    </div>
+  </div>
+
+  <hr>
+  <div class="sec-title">每天5分钟</div>
+  <div class="card tag-teal">
+    <div class="card-header" onclick="toggle(this)">📋 每日任务 <span class="arrow">▶</span></div>
+    <div class="card-body">
+      <div class="check-item"><span class="check-dot">①</span><span>打开LinkedIn，查看通知和消息</span></div>
+      <div class="check-item"><span class="check-dot">②</span><span>搜索 "flexible solar" → 点"动态" → 留一条有价值的评论</span></div>
+      <div class="check-item"><span class="check-dot">③</span><span>有询盘立即回复（用话术TAB模板）</span></div>
+      <div class="highlight-amber">⚠️ 加人标准：有头像 + 有动态 + 职位匹配 才加</div>
+    </div>
+  </div>
+
+  <div class="sec-title">帖子发布计划</div>
+  <div class="card tag-amber">
+    <div class="card-header" onclick="toggle(this)">🗓 5条帖子进度 <span class="arrow">▶</span></div>
+    <div class="card-body">
+      <div class="check-item"><span class="check-dot">✅</span><span><b>第1条</b> — CIGS vs 单晶对比（已发）</span></div>
+      <div class="check-item"><span class="check-dot">✅</span><span><b>第2条</b> — 重量对比2.9kg（已发）</span></div>
+      <div class="check-item"><span class="check-dot">✅</span><span><b>第3条</b> — 海洋浮标（已发）</span></div>
+      <div class="check-item"><span class="check-dot warn">📅</span><span><b>第4条</b> — CIGS技术科普 → 下周四</span></div>
+      <div class="check-item"><span class="check-dot warn">📅</span><span><b>第5条</b> — 工厂认证 → 下下周一</span></div>
+    </div>
+  </div>
+
+  <div class="sec-title">搜索关键词库</div>
+  <div class="card tag-blue">
+    <div class="card-header" onclick="toggle(this)">🔍 买家搜索词 <span class="arrow">▶</span></div>
+    <div class="card-body">
+      <div class="check-item"><span class="check-dot">🚐</span><span>RV solar dealer / RV solar installer</span></div>
+      <div class="check-item"><span class="check-dot">⛵</span><span>yacht solar / marine solar installer</span></div>
+      <div class="check-item"><span class="check-dot">🏢</span><span>BIPV contractor / facade solar</span></div>
+      <div class="check-item"><span class="check-dot">🏙</span><span>smart city lighting / solar street lamp</span></div>
+      <div class="check-item"><span class="check-dot">🌾</span><span>agrivoltaic / greenhouse solar</span></div>
+      <div class="check-item"><span class="check-dot">🎒</span><span>outdoor solar gear / solar backpack wholesale</span></div>
+      <div class="check-item"><span class="check-dot">🪖</span><span>military portable solar / emergency solar</span></div>
+      <div class="check-item"><span class="check-dot">💼</span><span>solar procurement manager / solar sourcing</span></div>
+    </div>
+  </div>
+
+  <div class="sec-title">加人标准</div>
+  <div class="card tag-teal">
+    <div class="card-header" onclick="toggle(this)">✅ 加 / ❌ 跳过 <span class="arrow">▶</span></div>
+    <div class="card-body">
+      <div class="check-item"><span class="check-dot">✅</span><span>有真实头像</span></div>
+      <div class="check-item"><span class="check-dot">✅</span><span>有近期动态（最近发过帖子）</span></div>
+      <div class="check-item"><span class="check-dot">✅</span><span>职位匹配：dealer/installer/owner/procurement</span></div>
+      <div class="check-item"><span class="check-dot no">✗</span><span>没有头像 → 跳过</span></div>
+      <div class="check-item"><span class="check-dot no">✗</span><span>没有动态 → 跳过</span></div>
+      <div class="check-item"><span class="check-dot no">✗</span><span>学生/求职者 → 跳过</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ 市场 TAB ══════════════ -->
+<div class="section" id="shichang">
+
+  <div class="sec-title">可引用的市场数据</div>
+
+  <div class="card tag-teal">
+    <div class="card-header" onclick="toggle(this)">📈 CIGS柔性薄膜市场 <span class="arrow">▶</span></div>
+    <div class="card-body">
+      <div class="spec-row"><span class="spec-key">2025年规模</span><span class="spec-val">~$40亿</span></div>
+      <div class="spec-row"><span class="spec-key">2035年预测</span><span class="spec-val">~$114亿</span></div>
+      <div class="spec-row"><span class="spec-key">年均增长</span><span class="spec-val">16.8%</span></div>
+      <div class="spec-row"><span class="spec-key">柔性需求增长</span><span class="spec-val">+42%</span></div>
+      <div class="en-text" id="cigs-data" style="margin-top:8px">The CIGS market is growing at 16.8% annually, projected to reach $11.4 billion by 2035. Flexible module demand alone grew 42%, driven by RV, marine, and BIPV applications.</div>
+      <button class="copy-btn" onclick="copyText('cigs-data', this)">复制英文</button>
+    </div>
+  </div>
+
+  <div class="card tag-amber">
+    <div class="card-header" onclick="toggle(this)">🏢 BIPV建筑集成市场 <span class="arrow">▶</span></div>
+    <div class="card-body">
+      <div class="spec-row"><span class="spec-key">2025年规模</span><span class="spec-val">$250–340亿</span></div>
+      <div class="spec-row"><span class="spec-key">2030年预测</span><span class="spec-val">$680亿–1000亿</span></div>
+      <div class="spec-row"><span class="spec-key">年均增长</span><span class="spec-val">~22%</span></div>
+      <div class="spec-row"><span class="spec-key">欧洲占比</span><span class="spec-val">41.8%最大市场</span></div>
+      <div class="spec-row"><span class="spec-key">薄膜技术</span><span class="spec-val">主导技术，最灵活</span></div>
+      <div class="en-text" id="bipv-data" style="margin-top:8px">The BIPV market reached $25–34 billion in 2025 and is projected to exceed $68 billion by 2030, growing at 22% annually. Europe leads with 41.8% market share, driven by zero-carbon building mandates in Germany, France, and the Netherlands.</div>
+      <button class="copy-btn" onclick="copyText('bipv-data', this)">复制英文</button>
+    </div>
+  </div>
+
+  <div class="card tag-teal">
+    <div class="card-header" onclick="toggle(this)">🌍 关键市场机会 <span class="arrow">▶</span></div>
+    <div class="card-body">
+      <div class="check-item"><span class="check-dot">🇺🇸</span><span><b>北美</b> — RV/游艇市场最大，BIPV 39.2%份额</span></div>
+      <div class="check-item"><span class="check-dot">🇪🇺</span><span><b>欧洲</b> — BIPV强制政策，VDE认证是敲门砖</span></div>
+      <div class="check-item"><span class="check-dot">🇯🇵</span><span><b>日本</b> — 农业光伏、Solar Frontier退出留下空缺</span></div>
+      <div class="check-item"><span class="check-dot">🌏</span><span><b>东南亚/中东</b> — 高温优势明显，离网需求大</span></div>
+      <div class="check-item"><span class="check-dot">🌍</span><span><b>非洲</b> — 离网/微电网，轻薄易运输</span></div>
+    </div>
+  </div>
+
+  <div class="card tag-purple">
+    <div class="card-header" onclick="toggle(this)">⚡ 为什么现在是最好时机 <span class="arrow">▶</span></div>
+    <div class="card-body">
+      <div class="check-item"><span class="check-dot warn">⚠</span><span>Solar Frontier 2023年停产 → 供应缺口</span></div>
+      <div class="check-item"><span class="check-dot">✅</span><span>欧洲零碳建筑法规推动BIPV需求</span></div>
+      <div class="check-item"><span class="check-dot">✅</span><span>RV市场后疫情持续高增长</span></div>
+      <div class="check-item"><span class="check-dot">✅</span><span>Marine/游艇市场对轻量化需求爆发</span></div>
+      <div class="check-item"><span class="check-dot">✅</span><span>Vanlin有VDE认证，竞品中国工厂大多没有</span></div>
+      <div class="en-text" id="timing" style="margin-top:8px">Solar Frontier — once the world's largest CIGS manufacturer — exited the market in 2023. Combined with growing RV, marine, and BIPV demand, this creates a real supply gap that Vanlin is positioned to fill.</div>
+      <button class="copy-btn" onclick="copyText('timing', this)">复制英文</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function switchTab(id, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  el.classList.add('active');
+}
+function toggle(header) {
+  header.classList.toggle('open');
+  header.nextElementSibling.classList.toggle('open');
+}
+function copyText(id, btn) {
+  const text = document.getElementById(id).innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ 已复制';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '复制'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+</script>
+</body>
+</html>
